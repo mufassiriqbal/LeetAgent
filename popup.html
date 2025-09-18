@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LeetCode Agent</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="popup">
+    <!-- Header -->
+    <header class="header">
+      <div class="logo">LC</div>
+      <div>
+        <h1 class="h-title">LeetCode Agent</h1>
+        <p class="h-sub">GitHub Integration & AI Assistant</p>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+      <!-- Authentication Section -->
+      <section id="authSection">
+        <button id="loginBtn" class="btn btn-primary">
+          <span id="loginText">Login with GitHub</span>
+          <span id="loginSpinner" class="spinner" style="display: none;"></span>
+        </button>
+        <button id="logoutBtn" class="btn btn-secondary" style="display: none;">
+          Logout
+        </button>
+      </section>
+
+      <!-- Status Display -->
+      <div id="status" role="status" aria-live="polite"></div>
+
+      <!-- Actions Section (shown when authenticated) -->
+      <section id="actionsSection" style="display: none;">
+        <h3>Quick Actions</h3>
+        <button id="pushCurrentBtn" class="btn btn-secondary">
+          Push Current Solution
+        </button>
+        <button id="checkStatusBtn" class="btn btn-secondary">
+          Check Status
+        </button>
+      </section>
+
+      <!-- Settings Section -->
+      <section id="settingsSection" style="display: none;">
+        <h3>Settings</h3>
+        <div class="form-group">
+          <label for="repoName">Repository Name:</label>
+          <input type="text" id="repoName" placeholder="leetcode-solutions" class="form-control">
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <p>Securely connect to GitHub and automate your LeetCode workflow.</p>
+    </footer>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
