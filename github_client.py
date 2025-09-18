@@ -1,7 +1,3 @@
-"""
-github_client.py - LeetCode Agent
-TODO: Add content from Claude artifacts
-"""
 
 import requests
 import base64

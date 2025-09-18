@@ -1,7 +1,3 @@
-// content.js - LeetCode Agent
-// TODO: Add content from Claude artifacts
-
-// content.js - Injected into LeetCode pages to extract problem and solution data
 
 (function() {
     'use strict';

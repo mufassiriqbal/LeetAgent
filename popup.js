@@ -1,13 +1,17 @@
-// popup.js - LeetCode Agent
-// TODO: Add content from Claude artifacts
-
 // DOM elements
+const configSection = document.getElementById("configSection");
+const authSection = document.getElementById("authSection");
+const clientIdInput = document.getElementById("clientIdInput");
+const clientIdDisplay = document.getElementById("clientIdDisplay");
+const saveConfigBtn = document.getElementById("saveConfigBtn");
+const editConfigBtn = document.getElementById("editConfigBtn");
+const instructionsSection = document.getElementById("instructionsSection");
+
 const loginBtn = document.getElementById("loginBtn");
 const logoutBtn = document.getElementById("logoutBtn");
 const loginText = document.getElementById("loginText");
 const loginSpinner = document.getElementById("loginSpinner");
 const status = document.getElementById("status");
-const authSection = document.getElementById("authSection");
 const actionsSection = document.getElementById("actionsSection");
 const settingsSection = document.getElementById("settingsSection");
 const pushCurrentBtn = document.getElementById("pushCurrentBtn");
@@ -17,16 +21,21 @@ const repoNameInput = document.getElementById("repoName");
 // State management
 let isAuthenticated = false;
 let isLoading = false;
+let isConfigured = false;
 
 // Initialize popup
 document.addEventListener("DOMContentLoaded", async () => {
+  await checkConfiguration();
   await checkAuthStatus();
   await loadSettings();
   setupEventListeners();
+  updateUI();
 });
 
 // Event listeners
 function setupEventListeners() {
+  saveConfigBtn.addEventListener("click", saveConfiguration);
+  editConfigBtn.addEventListener("click", editConfiguration);
   loginBtn.addEventListener("click", handleLogin);
   logoutBtn.addEventListener("click", handleLogout);
   pushCurrentBtn.addEventListener("click", handlePushCurrent);
@@ -34,12 +43,82 @@ function setupEventListeners() {
   repoNameInput.addEventListener("change", saveSettings);
 }
 
+// Configuration functions
+async function checkConfiguration() {
+  try {
+    const result = await chrome.storage.local.get(['githubClientId']);
+    if (result.githubClientId) {
+      isConfigured = true;
+      clientIdDisplay.value = result.githubClientId;
+      updateStatus("✅ GitHub OAuth configured", "success");
+    } else {
+      isConfigured = false;
+      updateStatus("⚠️ GitHub OAuth not configured", "warning");
+    }
+  } catch (error) {
+    console.error("Configuration check error:", error);
+    isConfigured = false;
+  }
+}
+
+async function saveConfiguration() {
+  const clientId = clientIdInput.value.trim();
+  
+  if (!clientId) {
+    updateStatus("❌ Please enter a valid Client ID", "error");
+    return;
+  }
+  
+  // Basic validation
+  if (clientId.length < 10 || !clientId.startsWith('Iv') && !clientId.startsWith('Ov')) {
+    updateStatus("❌ Invalid Client ID format", "error");
+    return;
+  }
+  
+  try {
+    setLoading(true);
+    updateStatus("Saving configuration...", "info");
+    
+    // Save to extension storage
+    await chrome.storage.local.set({ githubClientId: clientId });
+    
+    // Send to background script
+    const response = await sendMessage({ type: "setClientId", clientId: clientId });
+    
+    if (response.success) {
+      isConfigured = true;
+      clientIdDisplay.value = clientId;
+      clientIdInput.value = "";
+      updateStatus("✅ Configuration saved successfully!", "success");
+      updateUI();
+    } else {
+      updateStatus(`❌ Failed to save: ${response.error}`, "error");
+    }
+  } catch (error) {
+    console.error("Save configuration error:", error);
+    updateStatus(`❌ Save failed: ${error.message}`, "error");
+  } finally {
+    setLoading(false);
+  }
+}
+
+function editConfiguration() {
+  isConfigured = false;
+  updateUI();
+  updateStatus("Edit your GitHub Client ID below", "info");
+}
+
 // Authentication functions
 async function handleLogin() {
   if (isLoading) return;
   
+  if (!isConfigured) {
+    updateStatus("❌ Please configure GitHub Client ID first", "error");
+    return;
+  }
+  
   setLoading(true);
-  updateStatus("Connecting to GitHub...", "info");
+  updateStatus("Opening GitHub OAuth...", "info");
   
   try {
     const response = await sendMessage({ type: "login" });
@@ -61,7 +140,7 @@ async function handleLogin() {
 
 async function handleLogout() {
   try {
-    await chrome.storage.local.remove(['githubToken', 'tokenExpiry']);
+    await chrome.storage.local.remove(['githubAuthenticated', 'lastAuthCheck']);
     
     // Also notify backend
     try {
@@ -146,11 +225,12 @@ async function handleCheckStatus() {
     
     if (response.authenticated) {
       updateStatus("✅ GitHub connection active", "success");
+      isAuthenticated = true;
     } else {
       updateStatus("❌ Not connected to GitHub", "error");
       isAuthenticated = false;
-      updateUI();
     }
+    updateUI();
   } catch (error) {
     updateStatus(`Status check failed: ${error.message}`, "error");
   } finally {
@@ -161,13 +241,11 @@ async function handleCheckStatus() {
 // Utility functions
 async function checkAuthStatus() {
   try {
-    const result = await chrome.storage.local.get(['githubToken', 'tokenExpiry']);
-    isAuthenticated = !!(result.githubToken && result.tokenExpiry > Date.now());
-    updateUI();
+    const response = await sendMessage({ type: "checkStatus" });
+    isAuthenticated = response.authenticated;
   } catch (error) {
     console.error("Auth check error:", error);
     isAuthenticated = false;
-    updateUI();
   }
 }
 
@@ -191,16 +269,29 @@ async function saveSettings() {
 }
 
 function updateUI() {
-  if (isAuthenticated) {
-    loginBtn.style.display = "none";
-    logoutBtn.style.display = "block";
-    actionsSection.style.display = "block";
-    settingsSection.style.display = "block";
-  } else {
-    loginBtn.style.display = "block";
-    logoutBtn.style.display = "none";
+  // Show/hide sections based on configuration and authentication state
+  if (!isConfigured) {
+    configSection.style.display = "block";
+    authSection.style.display = "none";
     actionsSection.style.display = "none";
     settingsSection.style.display = "none";
+    instructionsSection.style.display = "block";
+  } else if (!isAuthenticated) {
+    configSection.style.display = "none";
+    authSection.style.display = "block";
+    actionsSection.style.display = "none";
+    settingsSection.style.display = "block"; // Show settings for repo name
+    instructionsSection.style.display = "none";
+    loginBtn.style.display = "block";
+    logoutBtn.style.display = "none";
+  } else {
+    configSection.style.display = "none";
+    authSection.style.display = "block";
+    actionsSection.style.display = "block";
+    settingsSection.style.display = "block";
+    instructionsSection.style.display = "none";
+    loginBtn.style.display = "none";
+    logoutBtn.style.display = "block";
   }
 }
 
@@ -209,6 +300,7 @@ function setLoading(loading) {
   loginBtn.disabled = loading;
   pushCurrentBtn.disabled = loading;
   checkStatusBtn.disabled = loading;
+  saveConfigBtn.disabled = loading;
   
   if (loading) {
     loginSpinner.style.display = "inline-block";

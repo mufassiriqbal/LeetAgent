@@ -1,6 +1,5 @@
 # LeetCode Agent Setup Checklist
-
-## Files to Fill with Content from Claude Artifacts:
+:
 
 ### Backend Files (Python):
 - [ ] app.py                 → Copy from "Corrected app.py"

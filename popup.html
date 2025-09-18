@@ -17,42 +17,69 @@
       </div>
     </header>
 
-    <!-- Main Content -->
-    <main>
-      <!-- Authentication Section -->
-      <section id="authSection">
-        <button id="loginBtn" class="btn btn-primary">
-          <span id="loginText">Login with GitHub</span>
-          <span id="loginSpinner" class="spinner" style="display: none;"></span>
-        </button>
-        <button id="logoutBtn" class="btn btn-secondary" style="display: none;">
-          Logout
-        </button>
-      </section>
+    <!-- Configuration Section (shown when not configured) -->
+    <section id="configSection">
+      <h3>⚙️ Configuration Required</h3>
+      <div class="form-group">
+        <label for="clientIdInput">GitHub Client ID:</label>
+        <input type="text" id="clientIdInput" placeholder="Enter your GitHub OAuth Client ID" class="form-control">
+        <small class="help-text">
+          <a href="https://github.com/settings/developers" target="_blank">Create GitHub OAuth App</a>
+        </small>
+      </div>
+      <button id="saveConfigBtn" class="btn btn-primary">Save Configuration</button>
+    </section>
 
-      <!-- Status Display -->
-      <div id="status" role="status" aria-live="polite"></div>
+    <!-- Authentication Section -->
+    <section id="authSection" style="display: none;">
+      <button id="loginBtn" class="btn btn-primary">
+        <span id="loginText">Login with GitHub</span>
+        <span id="loginSpinner" class="spinner" style="display: none;"></span>
+      </button>
+      <button id="logoutBtn" class="btn btn-secondary" style="display: none;">
+        Logout
+      </button>
+    </section>
 
-      <!-- Actions Section (shown when authenticated) -->
-      <section id="actionsSection" style="display: none;">
-        <h3>Quick Actions</h3>
-        <button id="pushCurrentBtn" class="btn btn-secondary">
-          Push Current Solution
-        </button>
-        <button id="checkStatusBtn" class="btn btn-secondary">
-          Check Status
-        </button>
-      </section>
+    <!-- Status Display -->
+    <div id="status" role="status" aria-live="polite"></div>
 
-      <!-- Settings Section -->
-      <section id="settingsSection" style="display: none;">
-        <h3>Settings</h3>
-        <div class="form-group">
-          <label for="repoName">Repository Name:</label>
-          <input type="text" id="repoName" placeholder="leetcode-solutions" class="form-control">
-        </div>
-      </section>
-    </main>
+    <!-- Actions Section (shown when authenticated) -->
+    <section id="actionsSection" style="display: none;">
+      <h3>Quick Actions</h3>
+      <button id="pushCurrentBtn" class="btn btn-secondary">
+        Push Current Solution
+      </button>
+      <button id="checkStatusBtn" class="btn btn-secondary">
+        Check Status
+      </button>
+    </section>
+
+    <!-- Settings Section -->
+    <section id="settingsSection" style="display: none;">
+      <h3>Settings</h3>
+      <div class="form-group">
+        <label for="repoName">Repository Name:</label>
+        <input type="text" id="repoName" placeholder="leetcode-solutions" class="form-control">
+      </div>
+      <div class="form-group">
+        <label for="clientIdDisplay">GitHub Client ID:</label>
+        <input type="text" id="clientIdDisplay" readonly class="form-control">
+        <button id="editConfigBtn" class="btn btn-secondary btn-sm">Edit</button>
+      </div>
+    </section>
+
+    <!-- Setup Instructions -->
+    <section id="instructionsSection">
+      <h3>📋 Setup Instructions</h3>
+      <ol class="setup-steps">
+        <li>Create a <a href="https://github.com/settings/developers" target="_blank">GitHub OAuth App</a></li>
+        <li>Use callback URL: <code>http://localhost:5000/callback</code></li>
+        <li>Copy your Client ID and paste it above</li>
+        <li>Make sure your backend server is running</li>
+        <li>Click "Login with GitHub"</li>
+      </ol>
+    </section>
 
     <!-- Footer -->
     <footer class="footer">

@@ -1,7 +1,3 @@
-"""
-email_client.py - LeetCode Agent
-TODO: Add content from Claude artifacts
-"""
 
 import schedule
 import time

@@ -1,7 +1,4 @@
-"""
-config.py - LeetCode Agent
-TODO: Add content from Claude artifacts
-"""
+
 
 import os
 from dotenv import load_dotenv
