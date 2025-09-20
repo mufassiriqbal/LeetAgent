@@ -2,7 +2,7 @@
 
 An intelligent Chrome extension and Python backend that automates your LeetCode workflow with GitHub integration, AI-powered analysis, and smart notifications.
 
-## Features
+## Features 
 
 ### 🚀 Core Functionality
 - **Automatic Solution Extraction**: Extract problem details and your solution code from LeetCode pages
